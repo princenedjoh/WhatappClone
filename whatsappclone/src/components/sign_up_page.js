@@ -1,6 +1,7 @@
 import '../assets/css/sign_up_page.css'
 import axios from 'axios'
 import {useState} from 'react'
+import { useNavigate } from 'react-router-dom'
 import {AiOutlineUser} from "react-icons/ai"
 import {RiLockPasswordLine} from "react-icons/ri"
 
@@ -12,14 +13,19 @@ const SignUpPage = ()=>{
 
     const [sign_up_username, set_sign_up_username] = useState("")
     const [sign_up_password, set_sign_up_password] = useState("")
+    const navigate = useNavigate()
 
 
     const sign_up_submit = async (e)=>{
-        await axios.post('http://localhost:3001/users',
+        e.preventDefault()
+        const createUser = await axios.post('http://localhost:3001/users',
         {
             username:sign_up_username,
             password:sign_up_password
         })
+        if(createUser.data.status === 200){
+            navigate('/signin')
+        }
     }
 
 

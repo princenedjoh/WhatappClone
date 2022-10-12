@@ -21,61 +21,46 @@ import {IoSendOutline} from "react-icons/io5"
 
 
 
-
+let userID
+let get_chat
 
 
 
 
 function RightPanel(){
-    const user_id = useParams().id
+    userID = useParams().id
+    const [partnerID, setPartnerID] = useState()
     const [message_box, set_message_box] = useState([])
+    const [partnerName, setPartnerName] = useState()
 
 
-
-
-
-    const get_chat = async ()=>{
-        const demo = await axios.get(`http://localhost:3001/chat/${user_id}`)
+    get_chat = async (partnerID2)=>{
+        setPartnerID(partnerID2)
+        console.log(partnerID2)
+        //get partner name
+        const getPartnerName = await axios.get(`http://localhost:3001/user/${partnerID2}`)
+        console.log(partnerID2)
+        console.log(getPartnerName.data)
+        setPartnerName(getPartnerName.data[0].username)
+        //get chat between both users
+        console.log(userID)
+        const demo = await axios.get(`http://localhost:3001/chat/${userID}/${partnerID2}`)
+        console.log(`${userID}, ${partnerID2}`)
         set_message_box(demo.data)
+        console.log(demo.data)
     }
     
-    useEffect(()=>{
-        get_chat()
-    },[])
-    
 
-
-
-
-
-
-
-
-
-    
-
-    const [message_box2, set_message_box2] = useState()
+    const [message_box2, set_message_box2] = useState("")
     const set_message_box2_func = (message_input2)=> {
         set_message_box2(message_input2)
     }
 
+    const sender = userID
+    const receiver = partnerID
 
 
-
-
-
-
-
-
-
-
-
-
-    const sender = user_id
-    const receiver = '62f426a3ee8a1953716617fa'
-
-
-
+    //sending a message
     const send_message = (e) =>{
         e.preventDefault()
         if(!message_box2 == ""){
@@ -149,7 +134,7 @@ function RightPanel(){
                         < FaUserCircle fontSize="50px" />
                         </div>
                         <div className="name">
-                            Stanley Obuobi
+                            {partnerName}
                         </div>
                     </div>
 
@@ -199,12 +184,12 @@ function RightPanel(){
                     </div>
                     <form className="message_from" onSubmit={e =>send_message(e)}>
                         <div className="message_box">
-                            <input type="text" onChange={e => set_message_box2_func(e.target.value)} placeholder="Type a message" value={message_box2} />
-                            <div className="send_message_button"> < IoSendOutline fontSize="18px"/> </div>
+                            <input type="text" value = {message_box2} onChange={e => set_message_box2_func(e.target.value)} placeholder="Type a message" value={message_box2} />
+                            <button type="submit" className="send_message_button"> < IoSendOutline fontSize="18px"/> </button>
                         </div>
-                        <button type="submit" className="microphone" >
+                        <div className="microphone" >
                             < BsMic fontSize="22px" />
-                        </button>
+                        </div>
                     </form>
 
                 </div>
@@ -218,3 +203,4 @@ function RightPanel(){
 
 
 export default RightPanel
+export { get_chat }

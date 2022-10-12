@@ -50,14 +50,6 @@ a{
 }
 
 
-.signup_usernameDivider{
-    height: 60%;
-    width: 1px;
-    background: #e4e3e3;
-    border-radius: 100px;
-}
-
-
 .signup_password input{
     padding: 3px;
     padding-left: 5px;

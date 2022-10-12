@@ -55,7 +55,16 @@ const post_users = async (req, res)=>{
             'username':username,
             'password':password
         })
-        res.json(users)
+        if(users){
+            res.json({
+                status : 200
+            })
+        }
+        else{
+            res.json({
+                status : 400
+            })
+        }
     }
 }
 
@@ -93,7 +102,16 @@ const delete_users = async (req, res)=>{
 }
 
 
+const get_users_search = async(req,res)=>{
+    const {searchValue} = req.params
+    const get_users_search_var = await users_model.find({
+        username : {$regex:searchValue}
+    })
+    res.json(get_users_search_var)
+}
 
 
 
-export {get_users, get_user, post_users, update_user, delete_users, get_users1}
+
+
+export {get_users, get_user, post_users, update_user, delete_users, get_users1, get_users_search}

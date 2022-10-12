@@ -22,9 +22,33 @@ const add_chat = async (req, res)=>{
 
 
 const get_chat = async(req, res)=>{
-    const {id} = req.params
+    const {userID} = req.params
     const get_chat_from_chat = await chat.find({
-        sender:id
+        $or : [
+            {sender:userID},
+            {receiver:userID}
+        ]
+    })
+    res.json(get_chat_from_chat)
+}
+
+
+const get_chat2 = async(req, res)=>{
+    const {userID, partnerID} = req.params
+    const get_chat_from_chat = await chat.find({
+        $and : [
+            {
+                $or : [
+                    {sender:userID}, {sender:partnerID}
+                ]
+            },
+            {
+                $or : [
+                    {receiver:partnerID}, {receiver:userID}
+                ]
+            }
+        ],
+
     })
     res.json(get_chat_from_chat)
 }
@@ -32,4 +56,4 @@ const get_chat = async(req, res)=>{
 
 
 
-export {add_chat, get_chat}
+export {add_chat, get_chat, get_chat2}
