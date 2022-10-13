@@ -1,5 +1,6 @@
 import axios from 'axios'
-import {useEffect, useState} from 'react'
+import SearchRoom from './searchRoom.js'
+import {useEffect, useState, useRef} from 'react'
 import { useParams } from 'react-router';
 import { get_chat } from './Right_panel.js'
 import '../assets/css/left_panel.css'
@@ -8,6 +9,8 @@ import {FaUserCircle} from "react-icons/fa"
 import {BsGlobe} from "react-icons/bs"
 import {AiOutlinePlus} from "react-icons/ai"
 import {BsThreeDots} from "react-icons/bs"
+import { IoArrowBackOutline } from 'react-icons/io5'
+import { MdOutlineCancel } from 'react-icons/md'
 
 
 
@@ -28,81 +31,41 @@ let partnerID
 
 function LeftPanel(props){
 
-
+    //refs
+    const searchRoom = useRef(null)
+    const chat_section = useRef(null)
+    const search_button = useRef(null)
+    const back_navigation_button = useRef(null)
+    const cancel_button = useRef(null)
 
     const userID = useParams().id
     const [partnerChats, setPartnerChats] = useState([])
+    const [searchValue, setSearchValue] = useState([])
     let partnerChats2 = []
     let partnerName
-    let searchValue
 
 
 
     //search functionality
     const searchFunctionality = async (e) =>{
-        searchValue = e.target.value
-        if (searchValue.length !== 0){
-            let searchUsers = []
-            const getSearchValue = await axios.get(`http://localhost:3001/users/search/${searchValue}`)
-            const getSearchValueFilter = getSearchValue.data.filter(getSearchValueFilter2 => 
-                    getSearchValueFilter2._id !== userID
-                )
-            console.log(getSearchValueFilter)
-            if(getSearchValueFilter.length !== 0){
-                getSearchValueFilter.map(getSearchValueFilterMap =>{
-                    partnerID = getSearchValueFilterMap._id
-                    console.log(partnerID)
-                    let partnerName = getSearchValueFilterMap.username
-                    const getUserChat = async()=>{
-                        const getUserChatVar =  await axios.get(`http://localhost:3001/chat/${partnerID}`)
-                        if(getUserChatVar.data.length !== 0){                     
-                            const getUserChatVarData = getUserChatVar.data
-                            let newChat = {
-                                partnerID:partnerID,
-                                partnerName:partnerName,
-                                messageNumber:getUserChatVarData.length,
-                                sender:getUserChatVarData[0].sender,
-                                receiver:getUserChatVarData[0].receiver,
-                                message:getUserChatVarData[0].message,
-                                month:getUserChatVarData[0].month,
-                                year:getUserChatVarData[0].year,
-                                hour:getUserChatVarData[0].hour,
-                                minute:getUserChatVarData[0].minute,
-                                delivered:true,
-                                seen:false
-                            }
-                            searchUsers.push(newChat)
-                            console.log(searchUsers)
-                            setPartnerChats([...searchUsers])
-                        }
-                        else{
-                            let newChat = {
-                                partnerID:partnerID,
-                                partnerName:partnerName,
-                                messageNumber:"",
-                                sender:"",
-                                receiver:"",
-                                message:"",
-                                month:"",
-                                year:"",
-                                hour:"",
-                                minute:"",
-                                delivered:true,
-                                seen:false
-                            }
-                            console.log(partnerID)
-                            searchUsers.push(newChat)
-                            console.log(searchUsers)
-                            setPartnerChats([...searchUsers])
-                        }
-                    }
-                    getUserChat()
-                })
-    
+        if(e.target.value.length !== 0){
+            search_button.current.style.display = 'none'
+            back_navigation_button.current.style.display = 'block'
+            cancel_button.current.style.display = 'block'
+            if(chat_section.current.style.display !== 'none'){
+                chat_section.current.style.display = 'none'
             }
+            if(searchRoom.current.style.display !== 'block'){
+                searchRoom.current.style.display = 'block'
+            }
+            setSearchValue(e.target.value)
         }
         else{
-            chats()
+            search_button.current.style.display = 'block'
+            back_navigation_button.current.style.display = 'none'
+            cancel_button.current.style.display = 'none'
+            console.log(searchRoom.current.style.display = 'none')
+            console.log(chat_section.current.style.display = 'flex')
         }
     }
 
@@ -248,19 +211,19 @@ function LeftPanel(props){
 
                 <div className="search_bar_div">
                     <div className="search_bar">
-                        <div className="search_button">
-                            <GoSearch/>
+                        <div className="search_button" ref={search_button}>
+                            <GoSearch  color="grey"/>
                         </div>
-                        <div className="back_navigation_button">
-
+                        <div className="back_navigation_button" ref={back_navigation_button}>
+                            <IoArrowBackOutline  color="grey"/>
                         </div>
                         <div className="search_input">
                             <input type="text" placeholder="Search or start new chat"
                                 onChange={e =>searchFunctionality(e)}
                                 ></input>
                         </div>
-                        <div className="cancel_button">
-                            
+                        <div className="cancel_button" ref={cancel_button}>
+                            < MdOutlineCancel color="grey"/>
                         </div>
                     </div>
                 </div>
@@ -268,9 +231,12 @@ function LeftPanel(props){
 
 
                 <div className="private_chats">
+                    <div className="searchRoom" ref={searchRoom}>
+                        < SearchRoom searchValue={searchValue}/>
+                    </div>
                     {partnerChats.map(partnerChatsMap=>{
                         return(
-                            <div className="chat_section" key={partnerChats.indexOf(partnerChatsMap)}
+                            <div className="chat_section" ref={chat_section} key={partnerChats.indexOf(partnerChatsMap)}
                                 onClick={()=>partnerMessageClick(partnerChatsMap.partnerID)}>
                                 <div className="private_chat_profile_picture">
         
